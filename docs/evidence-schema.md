@@ -15,7 +15,7 @@ Each evidence item contains the following fields.
 | Field | Type | Description |
 |--------|------|-------------|
 | evidence_id | String | Unique identifier for the evidence |
-| category | String | Type of evidence (Documentation, Dataset, Security, Dependency, Execution, etc.) |
+| category | Enum | Type of evidence (Documentation, Dataset, Security, Dependency, Execution, etc.) |
 | source | String | File, command, or system that produced the evidence |
 | check | String | Verification step performed |
 | status | Enum | Verified, Failed, Missing, Warning, Not Applicable |
