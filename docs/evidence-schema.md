@@ -67,12 +67,12 @@ Each evidence item contains the following fields.
 ```json
 {
   "evidence_id": "EV-001",
-  "category": "Documentation",
+  "category": "documentation",
   "source": "README.md",
   "check": "Installation instructions exist",
-  "status": "Verified",
+  "status": "verified",
   "confidence": 0.98,
-  "severity": "Low",
+  "severity": "low",
   "reason": "README contains installation and usage instructions.",
   "timestamp": "2026-07-05T18:45:00Z",
   "metadata": {
