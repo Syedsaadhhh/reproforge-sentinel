@@ -26,6 +26,41 @@ Each evidence item contains the following fields.
 | metadata | Object | Optional additional information |
 
 ---
+## Enum Definitions
+
+### Category
+
+| Value | Description |
+|-------|-------------|
+| documentation | README, guides, documentation |
+| dataset | Dataset files or dataset links |
+| dependency | requirements.txt, package.json, environment.yml |
+| execution | Build, install, execution, runtime logs |
+| security | Secrets, dangerous commands, permissions |
+| performance | Accuracy, benchmarks, latency |
+| model | Model weights, checkpoints, model cards |
+| configuration | Dockerfile, YAML, config files |
+| other | Any evidence that doesn't fit the above categories |
+
+### Status
+
+| Value | Description |
+|-------|-------------|
+| verified | Evidence supports the claim |
+| partially_verified | Evidence exists but is incomplete |
+| missing | Required evidence was not found |
+| failed | Evidence contradicts the claim |
+| warning | Evidence requires manual review |
+| not_applicable | Verification does not apply |
+
+### Severity
+
+| Value | Description |
+|-------|-------------|
+| low | Minimal impact |
+| medium | Moderate impact |
+| high | Significant impact |
+| critical | Critical issue requiring immediate attention |
 
 # Example
 
