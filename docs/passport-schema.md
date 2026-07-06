@@ -235,6 +235,47 @@ Fields:
 ```
 
 ---
+## Enum Definitions
+
+### Verdict
+
+| Value | Meaning |
+|--------|---------|
+| verified | Sufficient evidence supports the claim |
+| partially_verified | Some evidence exists, but important artifacts are missing |
+| not_verified | The claim cannot be confirmed |
+| high_risk | Significant risks were detected |
+| blocked | Verification was blocked due to safety concerns |
+
+---
+
+### Risk Level
+
+| Value | Meaning |
+|--------|---------|
+| low | Minimal execution risk |
+| medium | Moderate execution risk |
+| high | Significant execution risk |
+| blocked | Repository or workflow should not be executed |
+
+---
+
+### AMD Proof Mode
+
+| Value | Meaning |
+|--------|---------|
+| mock | Simulated verification (MVP mode) |
+| runtime | Verified using actual AMD/ROCm hardware |
+
+---
+
+### Credit Status
+
+| Value | Meaning |
+|--------|---------|
+| pending | AMD resources not yet available |
+| available | AMD resources available |
+| completed | Verification completed on AMD hardware |
 
 # Verdict Values
 
