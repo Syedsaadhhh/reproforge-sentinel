@@ -178,7 +178,7 @@ Fields:
 
   "summary": "The repository contains implementation artifacts, but the claimed accuracy could not be independently verified because the dataset and evaluation script are missing.",
 
-  "risk_level": "Medium",
+  "risk_level": "medium",
   "risk_score": 35,
   "reproducibility_score": 42,
   "credibility_score": 74,
@@ -187,26 +187,26 @@ Fields:
   "evidence_items": [
     {
       "evidence_id": "EV-001",
-      "category": "Documentation",
+      "category": "documentation",
       "source": "README.md",
       "check": "Accuracy claim verification",
-      "status": "Verified",
+      "status": "verified",
       "confidence": 0.94,
-      "severity": "Low",
+      "severity": "low",
       "reason": "README contains the claimed accuracy."
     }
   ],
 
   "missing_evidence": [
-    "Dataset",
-    "Evaluation Script",
-    "Model Weights"
+    "dataset",
+    "evaluation_script",
+    "model_weights"
   ],
 
   "risk_indicators": [
     {
       "indicator": "missing_dataset",
-      "severity": "Medium",
+      "severity": "medium",
       "points": 20,
       "reason": "No dataset or download instructions were found."
     }
@@ -214,8 +214,8 @@ Fields:
 
   "logs": [
     {
-      "step": "Static Repository Scan",
-      "status": "Completed",
+      "step": "static_repository_scan",
+      "status": "completed",
       "output": "Dataset not found."
     }
   ],
@@ -227,9 +227,9 @@ Fields:
   ],
 
   "amd_proof": {
-    "mode": "Mock",
-    "credit_status": "Pending",
-    "runtime_target": "ROCm / AMD GPU when available"
+    "mode": "mock",
+    "credit_status": "pending",
+    "runtime_target": "rocm"
   }
 }
 ```
