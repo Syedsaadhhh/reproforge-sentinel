@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlmodel import SQLModel
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncEngine
@@ -25,3 +26,8 @@ def create_session_maker(engine: AsyncEngine):
         expire_on_commit=False,
     )
     return async_session_maker
+
+
+async def create_all_table(engine: AsyncEngine):
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)

@@ -1,8 +1,6 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
-
 from backend.core import (
     AppDIContainer,
     AppDIProxy,
@@ -10,7 +8,9 @@ from backend.core import (
     create_engine,
     create_session_maker,
 )
+from backend.core.database import create_all_table
 from backend.internal.passport.handler import passport_router
+from fastapi import FastAPI
 
 
 @asynccontextmanager
@@ -18,9 +18,8 @@ async def lifespan(app: FastAPI):
     settings = Settings()
     engine = create_engine(settings.database_url)
     session_maker = create_session_maker(engine=engine)
-    AppDIProxy.initialize(
-        AppDIContainer(settings=settings, session_maker=session_maker)
-    )
+    AppDIProxy.initialize(AppDIContainer(settings=settings, session_maker=session_maker))
+    await create_all_table(engine=engine)
     yield
     AppDIProxy.clear()
 
