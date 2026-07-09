@@ -8,11 +8,12 @@ from backend.internal.passport.model import (
     ClaimIn,
     EvidenceItem,
     LogDetail,
+    PassportIn,
     PassportOut,
     RiskIndicator,
     VerificationOutput,
 )
-from backend.internal.passport.repository import get_passport_by_id
+from backend.internal.passport.repository import get_passport_by_id, insert_passport
 
 
 async def verify_service(claimData: ClaimIn) -> VerificationOutput:
@@ -54,6 +55,8 @@ async def verify_service(claimData: ClaimIn) -> VerificationOutput:
                 runtime_target="",
             ),
         )
+
+        await insert_passport(passport_detail=cast(PassportIn, results[index]))
     return VerificationOutput(passports=results)
 
 
@@ -138,9 +141,7 @@ async def get_passport_service(passport_id: int) -> PassportOut:
             for indicatorDetail in passport_detail.risk_indicators
         ],
         logs=[
-            LogDetail(
-                step=logDetail.step, status=logDetail.status, output=logDetail.output
-            )
+            LogDetail(step=logDetail.step, status=logDetail.status, output=logDetail.output)
             for logDetail in passport_detail.logs
         ],
         recommendations=passport_detail.recommendations,
