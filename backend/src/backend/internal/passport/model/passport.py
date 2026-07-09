@@ -1,14 +1,17 @@
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from backend.internal.passport import RiskLevel, Verdict
-from backend.internal.passport.model import AmdProof, LogDetail, RiskIndicator
+from backend.internal.passport.model.amd_proof import AMDProof
 from backend.internal.passport.model.evidence_item import EvidenceItem
+from backend.internal.passport.model.log_detail import LogDetail
+from backend.internal.passport.model.risk_indicator import RiskIndicator
 
 
 class PassportOut(BaseModel):
+    model_config = ConfigDict(strict=True)
     # Passport Metadata
     passport_id: str
     passport_version: str
@@ -41,4 +44,4 @@ class PassportOut(BaseModel):
 
     recommendations: List[str]
 
-    amd_proof: AmdProof
+    amd_proof: AMDProof

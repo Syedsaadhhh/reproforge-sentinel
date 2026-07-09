@@ -2,12 +2,13 @@ from dataclasses import field
 from datetime import datetime
 from typing import Any, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from backend.internal.passport.enum import EvidenceCategory, EvidenceSeverity, EvidenceStatus
 
 
 class EvidenceItem(BaseModel):
+    model_config = ConfigDict(strict=True)
     evidence_id: str
     category: EvidenceCategory
     source: str
@@ -17,4 +18,4 @@ class EvidenceItem(BaseModel):
     severity: EvidenceSeverity
     reason: str
     timestamp: datetime
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    extra_metadata: Dict[str, Any] = field(default_factory=dict)

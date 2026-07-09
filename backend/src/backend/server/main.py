@@ -10,6 +10,7 @@ from backend.core import (
     create_engine,
     create_session_maker,
 )
+from backend.internal.passport.handler import passport_router
 
 
 @asynccontextmanager
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(passport_router)
 
 if __name__ == "__main__":
     uvicorn.run(

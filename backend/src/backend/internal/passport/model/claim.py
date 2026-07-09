@@ -1,8 +1,8 @@
+from typing import List
+
 from pydantic import BaseModel, ConfigDict
 
 
-class LogDetail(BaseModel):
+class ClaimIn(BaseModel):
     model_config = ConfigDict(strict=True)
-    step: str
-    status: str
-    output: str
+    claims: List[str]
