@@ -138,7 +138,9 @@ async def get_passport_service(passport_id: int) -> PassportOut:
             for indicatorDetail in passport_detail.risk_indicators
         ],
         logs=[
-            LogDetail(step=logDetail.step, status=logDetail.status, output=logDetail.output)
+            LogDetail(
+                step=logDetail.step, status=logDetail.status, output=logDetail.output
+            )
             for logDetail in passport_detail.logs
         ],
         recommendations=passport_detail.recommendations,

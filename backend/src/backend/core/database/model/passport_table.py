@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import JSON, Column
-from sqlmodel import Field, Relationship, SQLModel
-
 from backend.core.database.model.evidence_table import EvidenceTable
 from backend.core.database.model.link_tables import PassportEvidenceLink
 from backend.core.database.model.log_table import LogTable
 from backend.core.database.model.risk_indicator_table import RiskIndicatorTable
 from backend.internal.passport import CreditStatus
 from backend.internal.passport.enum import AMDProofMode, RiskLevel, Verdict
+from sqlalchemy import JSON, Column
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class PassportTable(SQLModel, table=True):

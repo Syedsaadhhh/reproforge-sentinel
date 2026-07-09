@@ -18,7 +18,9 @@ async def lifespan(app: FastAPI):
     settings = Settings()
     engine = create_engine(settings.database_url)
     session_maker = create_session_maker(engine=engine)
-    AppDIProxy.initialize(AppDIContainer(settings=settings, session_maker=session_maker))
+    AppDIProxy.initialize(
+        AppDIContainer(settings=settings, session_maker=session_maker)
+    )
     yield
     AppDIProxy.clear()
 

@@ -1,13 +1,12 @@
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, ConfigDict
-
 from backend.internal.passport import RiskLevel, Verdict
 from backend.internal.passport.model.amd_proof import AMDProof
 from backend.internal.passport.model.evidence_item import EvidenceItem
 from backend.internal.passport.model.log_detail import LogDetail
 from backend.internal.passport.model.risk_indicator import RiskIndicator
+from pydantic import BaseModel, ConfigDict
 
 
 class PassportOut(BaseModel):
@@ -45,3 +44,7 @@ class PassportOut(BaseModel):
     recommendations: List[str]
 
     amd_proof: AMDProof
+
+
+class PassportIn(PassportOut):
+    pass

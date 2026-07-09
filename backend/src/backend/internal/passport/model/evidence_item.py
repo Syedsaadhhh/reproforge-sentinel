@@ -4,7 +4,11 @@ from typing import Any, Dict
 
 from pydantic import BaseModel, ConfigDict
 
-from backend.internal.passport.enum import EvidenceCategory, EvidenceSeverity, EvidenceStatus
+from backend.internal.passport.enum import (
+    EvidenceCategory,
+    EvidenceSeverity,
+    EvidenceStatus,
+)
 
 
 class EvidenceItem(BaseModel):
