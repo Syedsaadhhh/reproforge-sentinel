@@ -1,14 +1,11 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List
-
-from sqlalchemy import JSON, Column
-from sqlmodel import Field, Relationship, SQLModel
 
 from backend.core.database.model.link_tables import PassportEvidenceLink
 from backend.internal.passport import EvidenceCategory, EvidenceStatus
 from backend.internal.passport.enum import EvidenceSeverity
+from sqlalchemy import JSON, Column
+from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from backend.core.database.model.passport_table import PassportTable
@@ -29,6 +26,6 @@ class EvidenceTable(SQLModel, table=True):
         default_factory=dict,
     )
 
-    passports: List[PassportTable] = Relationship(
+    passports: List["PassportTable"] = Relationship(
         back_populates="evidence_items", link_model=PassportEvidenceLink
     )
