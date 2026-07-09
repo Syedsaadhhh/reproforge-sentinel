@@ -9,3 +9,9 @@ dependencies = []
 [tool.uv]
 package = false
 workspace = { members = ["backend"] }
+
+[dependency-groups]
+dev = [
+    "pyrefly>=1.1.1",
+    "ruff>=0.15.20",
+]
