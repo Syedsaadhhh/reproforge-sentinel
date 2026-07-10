@@ -302,3 +302,20 @@ AI can generate technical claims faster than humans can verify them.
 ReproForge Sentinel helps teams check those claims by turning them into evidence, risk signals, scores, and a clear Reproducibility Passport.
 
 It does not ask users to blindly trust AI output. It shows what was checked, what was missing, and why the final verdict was given.
+
+
+---
+
+## Judge-demo frontend
+
+The Lovable-generated TanStack Start frontend is integrated on the `agent/lovable-mvp-integration` branch.
+
+- Four screens: Judge Landing, Claim Intake, Live Sandbox Trace, Reproducibility Passport
+- Guided fixture mode by default, always labelled
+- Backend mode through `VITE_API_BASE_URL`
+- Client contracts: `POST /verify`, `GET /runs/{run_id}`, `GET /passport/{run_id}`
+- Intake state flows into the trace and Passport
+- Raw-log inspection, JSON export, browser PDF export, and run-specific share links
+- AMD/ROCm and Gemma proof remain explicitly unverified until backend confirmation
+
+Run `npm install && npm run dev` after the frontend files are present. Use `npm run build` and `npm run lint` for validation.
