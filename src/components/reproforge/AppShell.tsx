@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { ShieldCheck } from "lucide-react";
 import { FixtureBanner } from "./FixtureBanner";
+import { runtimeMode } from "@/lib/api";
 
 export function AppShell({
   children,
@@ -58,7 +59,7 @@ export function AppShell({
       <main className="mx-auto max-w-[1400px] px-6 py-8">{children}</main>
       <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-[1400px] flex-col items-start justify-between gap-2 px-6 py-6 font-mono text-[11px] text-muted-foreground md:flex-row md:items-center">
-          <span>reproforge-sentinel · fixture build · no live model calls</span>
+          <span>reproforge-sentinel · {runtimeMode} mode · proof-gated runtime claims</span>
           <span>policy shadowguard/2026.07-strict</span>
         </div>
       </footer>

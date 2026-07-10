@@ -1,81 +1,22 @@
-# Backend Plan
+# ReproForge Sentinel API
 
-Backend owner: Deban
+FastAPI backend for the claim → evidence → risk → Passport flow.
 
-The backend should support the basic ReproForge Sentinel flow:
+## Run
 
-```text
-project → claim → verification run → evidence → score → passport/result
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
 ```
 
-## Suggested stack
+Set the frontend variable `VITE_API_BASE_URL=http://localhost:8000`.
 
-- FastAPI
-- SQLite for very early MVP, PostgreSQL later
-- Redis later for cache/job status
-- Pydantic schemas
+## Proof behaviour
 
-## First routes
+- With no `GEMMA_API_KEY`, the evidence narrative is deterministic and labelled `fixture_until_backend`.
+- With a valid key, the adapter calls the official Gemini API Gemma 4 model and marks proof real only after a successful response.
+- AMD proof becomes `LIVE_ROCM_VERIFIED` only when `amd-smi metric --json` succeeds. Missing hardware or tooling stays pending.
 
-```text
-GET  /health
-POST /projects
-POST /claims
-POST /verify
-GET  /runs/{id}
-GET  /passport/{id}
-```
-
-## First models
-
-```text
-Project
-- id
-- name
-- description
-- created_at
-
-Claim
-- id
-- project_id
-- claim_text
-- source_type
-- created_at
-
-VerificationRun
-- id
-- claim_id
-- status
-- verdict
-- risk_score
-- reproducibility_score
-- created_at
-
-EvidenceItem
-- id
-- run_id
-- source
-- check
-- status
-- details
-- confidence
-
-Passport
-- id
-- run_id
-- summary
-- verdict
-- evidence_coverage
-- output_json
-```
-
-## First verify workflow
-
-1. Receive claim input
-2. Parse the claim text
-3. Detect sample risk indicators
-4. Return score and verdict
-5. Store result
-6. Return passport-style JSON
-
-Keep it simple first. The goal is a working flow, not a perfect backend.
+The backend does not yet clone or execute arbitrary repositories. Its current job is to establish the real API/data/proof pipeline safely.

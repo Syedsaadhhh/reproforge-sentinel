@@ -25,14 +25,14 @@ export function AMDProofCard({ proof }: { proof: AmdGemmaProof }) {
 }
 
 export function GemmaProofCard({ proof }: { proof: AmdGemmaProof }) {
-  const isReal = proof.proof_status === "real_api_call" && proof.fireworks_confirmed;
+  const isReal = proof.proof_status === "real_api_call" && proof.gemma_used;
   return (
     <ProofCard
       eyebrow="Gemma explanation"
       title="Model provider proof"
       action={
         isReal ? (
-          <StatusBadge tone="success">FIREWORKS_GEMMA_ACTIVE</StatusBadge>
+          <StatusBadge tone="success">GEMMA_4_API_ACTIVE</StatusBadge>
         ) : (
           <StatusBadge tone="warning">fixture_until_backend</StatusBadge>
         )
@@ -48,8 +48,8 @@ export function GemmaProofCard({ proof }: { proof: AmdGemmaProof }) {
       </dl>
       {!isReal && (
         <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-          Fireworks call not confirmed by the backend. The proof status stays fixture-only; the UI
-          never displays <span className="font-mono text-foreground">FIREWORKS_GEMMA_ACTIVE</span>{" "}
+          Gemma 4 call not confirmed by the backend. The proof status stays fixture-only; the UI
+          never displays <span className="font-mono text-foreground">GEMMA_4_API_ACTIVE</span>{" "}
           unless the backend attaches a verified response.
         </p>
       )}

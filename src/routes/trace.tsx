@@ -10,7 +10,7 @@ import { MetricCard } from "@/components/reproforge/MetricCard";
 import { Button } from "@/components/ui/button";
 import { fixtureLogLines, mockPassport, timelineSteps } from "@/data/mockPassport";
 import { verifyClaim, loadClaimInput, sampleClaimInput } from "@/lib/traceUtils";
-import type { ClaimInput } from "@/lib/api";
+import { getPassport, getRunStatus, runtimeMode, type ClaimInput } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Pause, Play, Square } from "lucide-react";
 
@@ -42,6 +42,8 @@ function TracePage() {
   const [claimInput, setClaimInput] = useState<ClaimInput>(sampleClaimInput);
   const [rawLogsOpen, setRawLogsOpen] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  const [sourceLogs, setSourceLogs] = useState(fixtureLogLines);
+  const [passport, setPassport] = useState(mockPassport);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -53,6 +55,15 @@ function TracePage() {
         const handle = await verifyClaim(input);
         if (cancelled) return;
         setRunId(handle.run_id);
+        if (runtimeMode === "backend") {
+          const [status, backendPassport] = await Promise.all([
+            getRunStatus(handle.run_id),
+            getPassport(handle.run_id),
+          ]);
+          if (cancelled) return;
+          setSourceLogs(status.logs);
+          setPassport(backendPassport);
+        }
         setStep(0);
       } catch (error) {
         if (!cancelled) setRunError(error instanceof Error ? error.message : "Verification failed");
@@ -65,10 +76,10 @@ function TracePage() {
 
   useEffect(() => {
     if (step < 0 || paused || killed) return;
-    if (step >= fixtureLogLines.length) return;
+    if (step >= sourceLogs.length) return;
     timerRef.current = window.setTimeout(
       () => {
-        setLogs((l) => [...l, fixtureLogLines[step]]);
+        setLogs((l) => [...l, sourceLogs[step]]);
         setStep((s) => s + 1);
       },
       step === 0 ? 400 : STEP_DELAY_MS,
@@ -76,11 +87,11 @@ function TracePage() {
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [step, paused, killed]);
+  }, [step, paused, killed, sourceLogs]);
 
-  const complete = step >= fixtureLogLines.length;
+  const complete = step >= sourceLogs.length;
   const activeStep = Math.min(step < 0 ? 0 : step, timelineSteps.length - 1);
-  const currentSignals = mockPassport.signals_found.slice(0, Math.max(0, step - 2));
+  const currentSignals = passport.signals_found.slice(0, Math.max(0, step - 2));
 
   return (
     <AppShell currentStep="trace">
@@ -193,15 +204,15 @@ function TracePage() {
           {step >= 3 && (
             <ProofCard eyebrow="blocked" title="ShadowGuard blocked actions">
               <ul className="space-y-1 font-mono text-[11px] text-danger/90">
-                {mockPassport.shadowguard_result.blocked_actions.map((a) => (
+                {passport.shadowguard_result.blocked_actions.map((a) => (
                   <li key={a}>× {a}</li>
                 ))}
               </ul>
             </ProofCard>
           )}
 
-          {step >= 4 && <AMDProofCard proof={mockPassport.amd_gemma_proof} />}
-          {step >= 5 && <GemmaProofCard proof={mockPassport.amd_gemma_proof} />}
+          {step >= 4 && <AMDProofCard proof={passport.amd_gemma_proof} />}
+          {step >= 5 && <GemmaProofCard proof={passport.amd_gemma_proof} />}
         </div>
       </div>
     </AppShell>
