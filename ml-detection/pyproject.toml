@@ -1,17 +1,11 @@
 [project]
-name = "backend"
+name = "ml-detection"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "aiosqlite>=0.22.1",
-    "fastapi>=0.139.0",
-    "ml-detection",
-    "pydantic-settings>=2.14.2",
-    "sqlalchemy>=2.0.51",
-    "sqlmodel>=0.0.39",
-    "uvicorn>=0.50.0",
+    "joblib>=1.5.3",
 ]
 
 [build-system]
@@ -20,6 +14,3 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.uv.sources]
-ml-detection = { workspace = true }

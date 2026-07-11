@@ -4,8 +4,9 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
+    "backend",
+    "ml-detection",
     "reproforge-sentinel",
-    "reproforge-sentinel-backend",
 ]
 
 [[package]]
@@ -46,6 +47,31 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/3b/72/5562aabb8dd7181e8e860622a38bea08d17842b99ecd4c91f84ac95251b0/anyio-4.14.1.tar.gz", hash = "sha256:8d648a3544c1a700e3ff78615cd679e4c5c3f149904287e73687b2596963629e", size = 254831, upload-time = "2026-06-24T20:56:06.017Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b0/7b/90df4a0a816d98d6ea26f559d87836d494a2cf1fcf063be67df50a7bcc30/anyio-4.14.1-py3-none-any.whl", hash = "sha256:4e5533c5b8ff0a24f5d7a176cbe6877129cd183893f66b537f8f227d10527d72", size = 124875, upload-time = "2026-06-24T20:56:04.413Z" },
+]
+
+[[package]]
+name = "backend"
+version = "0.1.0"
+source = { editable = "backend" }
+dependencies = [
+    { name = "aiosqlite" },
+    { name = "fastapi" },
+    { name = "ml-detection" },
+    { name = "pydantic-settings" },
+    { name = "sqlalchemy" },
+    { name = "sqlmodel" },
+    { name = "uvicorn" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiosqlite", specifier = ">=0.22.1" },
+    { name = "fastapi", specifier = ">=0.139.0" },
+    { name = "ml-detection", editable = "ml-detection" },
+    { name = "pydantic-settings", specifier = ">=2.14.2" },
+    { name = "sqlalchemy", specifier = ">=2.0.51" },
+    { name = "sqlmodel", specifier = ">=0.0.39" },
+    { name = "uvicorn", specifier = ">=0.50.0" },
 ]
 
 [[package]]
@@ -157,6 +183,26 @@ sdist = { url = "https://files.pythonhosted.org/packages/cd/63/9496c57188a2ee585
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/5e/d4e9f1a599fb8e573b7b87160658329fbf28d19eac2718f51fc3def3aa5a/idna-3.18-py3-none-any.whl", hash = "sha256:7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2", size = 65455, upload-time = "2026-06-02T14:34:06.319Z" },
 ]
+
+[[package]]
+name = "joblib"
+version = "1.5.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/f2/d34e8b3a08a9cc79a50b2208a93dce981fe615b64d5a4d4abee421d898df/joblib-1.5.3.tar.gz", hash = "sha256:8561a3269e6801106863fd0d6d84bb737be9e7631e33aaed3fb9ce5953688da3", size = 331603, upload-time = "2025-12-15T08:41:46.427Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7b/91/984aca2ec129e2757d1e4e3c81c3fcda9d0f85b74670a094cc443d9ee949/joblib-1.5.3-py3-none-any.whl", hash = "sha256:5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713", size = 309071, upload-time = "2025-12-15T08:41:44.973Z" },
+]
+
+[[package]]
+name = "ml-detection"
+version = "0.1.0"
+source = { editable = "ml-detection" }
+dependencies = [
+    { name = "joblib" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "joblib", specifier = ">=1.5.3" }]
 
 [[package]]
 name = "pydantic"
@@ -307,29 +353,6 @@ dev = [
 dev = [
     { name = "pyrefly", specifier = ">=1.1.1" },
     { name = "ruff", specifier = ">=0.15.20" },
-]
-
-[[package]]
-name = "reproforge-sentinel-backend"
-version = "0.1.0"
-source = { editable = "backend" }
-dependencies = [
-    { name = "aiosqlite" },
-    { name = "fastapi" },
-    { name = "pydantic-settings" },
-    { name = "sqlalchemy" },
-    { name = "sqlmodel" },
-    { name = "uvicorn" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiosqlite", specifier = ">=0.22.1" },
-    { name = "fastapi", specifier = ">=0.139.0" },
-    { name = "pydantic-settings", specifier = ">=2.14.2" },
-    { name = "sqlalchemy", specifier = ">=2.0.51" },
-    { name = "sqlmodel", specifier = ">=0.0.39" },
-    { name = "uvicorn", specifier = ">=0.50.0" },
 ]
 
 [[package]]

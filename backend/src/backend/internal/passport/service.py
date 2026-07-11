@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
-from typing import List, cast
+from typing import Dict, List, cast
+
+from ml_detection import shadowguard_analyze
 
 from backend.internal.passport import AMDProofMode, CreditStatus, RiskLevel, Verdict
 from backend.internal.passport.model import (
@@ -16,29 +18,94 @@ from backend.internal.passport.model import (
 from backend.internal.passport.repository import get_passport_by_id, insert_passport
 
 
+def _analyze_claim_with_shadowguard(claim: str, index: int) -> Dict:
+    """Run shadowguard prompt-injection analysis on a single claim.
+
+    Returns a dict with keys: verdict, confidence, signals_found, reason.
+    Falls back to benign if analysis fails.
+    """
+    try:
+        # Runs directly and safely now that paths are absolute inside the package
+        result = shadowguard_analyze(
+            input_type="prompt",
+            text=claim,
+            case_id=f"verify_claim_{index}",
+        )
+        return {
+            "verdict": result.get("verdict", "benign"),
+            "confidence": result.get("confidence", 0),
+            "signals_found": result.get("signals_found", []),
+            "reason": result.get("reason", ""),
+        }
+    except Exception as e:
+        # Fail-open: if shadowguard is down/unavailable, treat as benign
+        return {
+            "verdict": "benign",
+            "confidence": 0,
+            "signals_found": [],
+            "reason": f"Shadowguard analysis failed: {e}",
+        }
+
+
 async def verify_service(claimData: ClaimIn) -> VerificationOutput:
     claims = _parse_claims(claimData=claimData)
     evidences = _collect_evidence(claims=claims)
     results: List[PassportOut] = [cast(PassportOut, None) for _ in range(len(claims))]
     for index, claim in enumerate(claims):
+        shadowguard_result = _analyze_claim_with_shadowguard(claim, index)
+
         risk_level = RiskLevel.LOW
         risk_score = 0
         verdict = Verdict.VERIFIED
-        if _is_contain_risky_command(text=claim):
-            risk_level = RiskLevel.HIGH
-            risk_score = 70
-        if _is_contain_perventage_claim(text=claim) and "eval_file" not in evidences:
-            verdict = Verdict.PARTIALLY_VERIFIED
+        summary = "Stub verification result"
+        risk_indicators = []
+        logs = []
+
+        # Shadowguard result takes precedence if attack detected
+        if shadowguard_result["verdict"] == "attack":
+            risk_level = RiskLevel.BLOCKED
+            risk_score = 90
+            verdict = Verdict.BLOCKED
+            summary = f"Blocked: prompt injection detected (confidence: {shadowguard_result['confidence']})"
+            for signal in shadowguard_result["signals_found"]:
+                risk_indicators.append(
+                    RiskIndicator(
+                        indicator=signal,
+                        severity="CRITICAL",
+                        points=20,
+                        reason=(
+                            f"Shadowguard detected prompt injection pattern: {signal}. "
+                            f"{shadowguard_result['reason']}"
+                        ),
+                    )
+                )
+            logs.append(
+                LogDetail(
+                    step="shadowguard_analysis",
+                    status="BLOCKED",
+                    output=(f"Detected {len(shadowguard_result['signals_found'])} prompt injection signals"),
+                )
+            )
+        else:
+            # Existing verification logic
+            if _is_contain_risky_command(text=claim):
+                risk_level = RiskLevel.HIGH
+                risk_score = 70
+                summary = "Risky command detected in claim"
+            if _is_contain_perventage_claim(text=claim) and "eval_file" not in evidences:
+                verdict = Verdict.PARTIALLY_VERIFIED
+                summary = "Percentage claim detected, missing eval_file evidence"
+
         results[index] = PassportOut(
             passport_id="stub",
             passport_version="0.0.1",
             generated_at=datetime.now(),
-            verification_engine="reproforge-stub",
+            verification_engine="reproforge-stub+shadowguard",
             project_id="stub",
             claim_id="stub",
             claim_text=claim,
             verdict=verdict,
-            summary="Stub verification result",
+            summary=summary,
             risk_level=risk_level,
             risk_score=risk_score,
             reproducibility_score=0,
@@ -46,8 +113,8 @@ async def verify_service(claimData: ClaimIn) -> VerificationOutput:
             evidence_coverage=0,
             evidence_items=[],
             missing_evidence=[],
-            risk_indicators=[],
-            logs=[],
+            risk_indicators=risk_indicators,
+            logs=logs,
             recommendations=[],
             amd_proof=AMDProof(
                 mode=AMDProofMode.MOCK,
