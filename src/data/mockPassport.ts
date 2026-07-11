@@ -1,6 +1,6 @@
 export type ProofStatus = "fixture_until_backend" | "real_api_call";
 
-export type AmdProofStatus = "AMD_PATH_CONFIGURED" | "AMD_AWARE_SIMULATED";
+export type AmdProofStatus = "AMD_PATH_CONFIGURED" | "AMD_AWARE_SIMULATED" | "LIVE_ROCM_VERIFIED";
 
 export type Verdict = "verified" | "unverified" | "blocked" | "partial";
 
@@ -22,15 +22,16 @@ export interface RiskSignal {
 export interface AmdGemmaProof {
   gemma_used: boolean;
   gemma_task: "risk_explanation" | "claim_summary" | "evidence_narrative";
-  model_provider: "fireworks";
+  model_provider: "fireworks" | "google-gemini-api" | "local";
   model_family: "gemma";
   model_name: string;
-  runtime_mode: "fireworks" | "local";
+  runtime_mode: string;
   amd_proof_status: AmdProofStatus;
   proof_status: ProofStatus;
   fireworks_confirmed: boolean;
   latency_ms: number;
   tokens_used: number;
+  amd_telemetry?: Record<string, unknown>;
 }
 
 export interface ShadowGuardResult {
