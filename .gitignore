@@ -1,56 +1,32 @@
-# Environment files
-.env
-.env.*
-!.env.example
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-.venv/
-venv/
-env/
-*.egg-info/
-dist/
-build/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Node / frontend
-node_modules/
-.next/
-dist/
-build/
-.vite/
-
-# IDE / OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
 # Logs
+logs
 *.log
-logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Large local artifacts
-*.zip
-*.tar
-*.tar.gz
-*.7z
-*.rar
+node_modules
+dist
+dist-ssr
+.output
+.vinxi
+.tanstack/**
+.nitro
+*.local
 
-# Secrets / keys
-*.pem
-*.key
-*.crt
-secrets/
-credentials/
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars
 
-# Local databases
-*.sqlite
-*.sqlite3
-*.db
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
