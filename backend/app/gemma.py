@@ -11,9 +11,19 @@ Return concise plain text suitable for a technical audit passport."""
 
 
 async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) -> dict:
+    fireworks_key = os.getenv("FIREWORKS_API_KEY")
+    fireworks_model = os.getenv("FIREWORKS_MODEL")
     api_key = os.getenv("GEMMA_API_KEY")
     model = os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it")
     fallback = _fallback_explanation(signals, missing)
+    prompt = json.dumps({"claim": claim, "signals": signals, "missing_evidence": missing})
+    if fireworks_key and fireworks_model:
+        return await _fireworks_explanation(
+            fireworks_key,
+            fireworks_model,
+            prompt,
+            fallback,
+        )
     if not api_key:
         return {
             "text": fallback,
@@ -26,7 +36,6 @@ async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) 
             "tokens_used": 0,
         }
 
-    prompt = json.dumps({"claim": claim, "signals": signals, "missing_evidence": missing})
     started = time.perf_counter()
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     payload = {
@@ -64,6 +73,47 @@ async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) 
         }
 
 
+async def _fireworks_explanation(api_key: str, model: str, prompt: str, fallback: str) -> dict:
+    started = time.perf_counter()
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": SYSTEM_INSTRUCTION},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.1,
+        "max_tokens": 500,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=45) as client:
+            response = await client.post(
+                "https://api.fireworks.ai/inference/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json=payload,
+            )
+            response.raise_for_status()
+            data = response.json()
+        return {
+            "text": data["choices"][0]["message"]["content"].strip(),
+            "used": True,
+            "provider": "fireworks",
+            "model": model,
+            "runtime_mode": "fireworks",
+            "proof_status": "real_api_call",
+            "latency_ms": round((time.perf_counter() - started) * 1000),
+            "tokens_used": int(data.get("usage", {}).get("total_tokens", 0)),
+        }
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
+        return {
+            "text": fallback,
+            "used": False,
+            "provider": "fireworks",
+            "model": model,
+            "runtime_mode": "api_error_fallback",
+            "proof_status": "fixture_until_backend",
+            "latency_ms": round((time.perf_counter() - started) * 1000),
+            "tokens_used": 0,
+        }
 def _fallback_explanation(signals: list[dict], missing: list[str]) -> str:
     signal_names = ", ".join(signal["label"].lower() for signal in signals) or "no critical risk signals"
     missing_text = ", ".join(item.lower() for item in missing) or "no declared evidence gaps"
