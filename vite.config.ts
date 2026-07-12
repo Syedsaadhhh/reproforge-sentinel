@@ -7,6 +7,11 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  nitro: {
+    // Render runs a persistent Node service; the default Cloudflare worker
+    // output cannot be started with `node` or Vite preview in production.
+    preset: "node-server",
+  },
   vite: {
     preview: {
       allowedHosts: ["reproforge-sentinel.onrender.com"],
