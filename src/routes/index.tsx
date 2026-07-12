@@ -60,7 +60,7 @@ function LandingPage() {
             <Feature
               icon={<Terminal className="h-4 w-4" />}
               title="Live trace"
-              body="Every step is streamed, hashed, and appended to the log ledger."
+              body="Every evaluation step is replayed from the backend result or a clearly labeled fixture."
             />
             <Feature
               icon={<FileCheck2 className="h-4 w-4" />}
