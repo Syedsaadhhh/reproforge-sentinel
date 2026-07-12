@@ -113,13 +113,23 @@ The following evidence required for complete verification was not available:
 ---
 
 ## AMD Verification
+## AMD & Gemma Proof
 
-| Field | Value |
-|--------|-------|
-| Mode | Mock |
-| Runtime Target | AMD ROCm |
-| Status | Pending Hardware Verification |
+| Field | Mock / Pending | Real Runtime |
+|--------|----------------|--------------|
+| Runtime Mode | mock | fireworks |
+| AMD Status | pending | active |
+| Gemma Used | No | Yes |
+| Gemma Tasks | — | claim_parser, passport_writer |
+| Model Provider | local_mock | fireworks |
+| Model Name | — | `<configured_fireworks_model_id>` |
+| Proof Status | mock | real |
+| Latency | — | 143 ms |
+| Tokens Used | — | 512 |
+| Run ID | — | run_xxxxx |
+| Timestamp | — | 2026-07-07T10:30:45Z |
 
+> **Note:** When runtime data is unavailable, the Passport uses the **Mock / Pending** values. After a successful Fireworks/Gemma invocation on AMD infrastructure, the backend replaces these fields with the actual runtime values.
 ---
 
 # Final Verdict
