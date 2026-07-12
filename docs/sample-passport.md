@@ -113,13 +113,25 @@ The following evidence required for complete verification was not available:
 ---
 
 ## AMD Verification
+AMD & Gemma Proof mock
+Runtime Mode : mock
+AMD Status : pending
+Gemma Used : No
+Proof Status : mock
 
-| Field | Value |
-|--------|-------|
-| Mode | Mock |
-| Runtime Target | AMD ROCm |
-| Status | Pending Hardware Verification |
+AMD & Gemma Proof realtime
+Runtime Mode : fireworks
+AMD Status : active
+Gemma Used : Yes
+Tasks
+• Claim Parser
+• Passport Writer
+Provider : Fireworks
+Model : <configured_fireworks_model_id>
 
+Proof Status : real
+Latency : 143 ms
+Tokens : 512
 ---
 
 # Final Verdict
