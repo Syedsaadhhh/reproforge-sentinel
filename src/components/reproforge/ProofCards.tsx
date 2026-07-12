@@ -4,7 +4,7 @@ import type { AmdGemmaProof } from "@/data/mockPassport";
 
 export function AMDProofCard({ proof }: { proof: AmdGemmaProof }) {
   const telemetryAvailable = proof.amd_telemetry?.available === true;
-  const isActive = proof.amd_status === "active" || proof.amd_proof_status === "LIVE_ROCM_VERIFIED";
+  const isActive =\n    proof.amd_status === "active" || proof.amd_proof_status === "LIVE_ROCM_VERIFIED";
 
   return (
     <ProofCard
