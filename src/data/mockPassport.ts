@@ -1,14 +1,6 @@
-export type ProofStatus =
-  | "mock"
-  | "pending"
-  | "real"
-  | "fixture_until_backend"
-  | "real_api_call";
+export type ProofStatus = "mock" | "pending" | "real" | "fixture_until_backend" | "real_api_call";
 
-export type AmdProofStatus =
-  | "AMD_PATH_CONFIGURED"
-  | "AMD_AWARE_SIMULATED"
-  | "LIVE_ROCM_VERIFIED";
+export type AmdProofStatus = "AMD_PATH_CONFIGURED" | "AMD_AWARE_SIMULATED" | "LIVE_ROCM_VERIFIED";
 
 export type Verdict = "verified" | "unverified" | "blocked" | "partial";
 
@@ -74,8 +66,7 @@ export interface Passport {
 
 export const sampleClaim = {
   repo_url: "https://github.com/example/agentic-rag-benchmark",
-  claim_text:
-    "Our agent claims 92.4% pass@1 on SWE-bench Verified using a 7B open-weights model.",
+  claim_text: "Our agent claims 92.4% pass@1 on SWE-bench Verified using a 7B open-weights model.",
   claim_type: "benchmark_result",
   runtime_target: "linux/x86_64 · ROCm · AMD-aware pending",
 };
@@ -100,14 +91,14 @@ export const mockPassport: Passport = {
       id: "sig-fixture-1",
       severity: "high",
       label: "Metric requires independent reproduction",
-      detail:
-        "Guided fixture: the quantitative claim does not include a sealed execution result.",
+      detail: "Guided fixture: the quantitative claim does not include a sealed execution result.",
     },
     {
       id: "sig-fixture-2",
       severity: "medium",
       label: "Dataset and seed provenance missing",
-      detail: "Guided fixture: the submitted metadata does not identify a dataset manifest or seed.",
+      detail:
+        "Guided fixture: the submitted metadata does not identify a dataset manifest or seed.",
     },
   ],
   evidence_items: [
@@ -126,10 +117,7 @@ export const mockPassport: Passport = {
       hash: "sha256:fixture-policy-hash",
     },
   ],
-  missing_evidence: [
-    "Independent sealed execution output.",
-    "Dataset and seed provenance.",
-  ],
+  missing_evidence: ["Independent sealed execution output.", "Dataset and seed provenance."],
   gemma_explanation:
     "This guided fixture identified a quantitative claim without independent execution evidence. The narrative is deterministic fallback text; no external Gemma request was made.",
   amd_gemma_proof: {
