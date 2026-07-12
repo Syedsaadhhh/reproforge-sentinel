@@ -99,7 +99,7 @@ function TracePage() {
         <div>
           <StatusBadge tone="cyan">step 02 · live trace</StatusBadge>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">
-            Sandbox run · <span className="font-mono text-primary">{runId}</span>
+            Verification run · <span className="font-mono text-primary">{runId}</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {runError
