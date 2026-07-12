@@ -226,11 +226,35 @@ Fields:
     "Document benchmark methodology."
   ],
 
-  "amd_proof": {
-    "mode": "mock",
-    "credit_status": "pending",
-    "runtime_target": "rocm"
+  "amd_gemma_proof mock": {
+  "runtime_mode": "mock",
+  "amd_status": "pending",
+  "gemma_used": false,
+  "gemma_tasks": [],
+  "model_provider": "local_mock",
+  "model_name": null,
+  "proof_status": "mock",
+  "latency_ms": null,
+  "tokens_used": null,
+  "run_id": null,
+  "timestamp": null
   }
+  "amd_gemma_proof realtime": {
+  "runtime_mode": "fireworks",
+  "amd_status": "active",
+  "gemma_used": true,
+  "gemma_tasks": [
+    "claim_parser",
+    "passport_writer"
+  ],
+  "model_provider": "fireworks",
+  "model_name": "<configured_fireworks_model_id>",
+  "proof_status": "real",
+  "latency_ms": 143,
+  "tokens_used": 512,
+  "run_id": "run_xxxxx",
+  "timestamp": "2026-07-07T10:30:45Z"
+}
 }
 ```
 
@@ -260,13 +284,17 @@ Fields:
 
 ---
 
-### AMD Proof Mode
+### Amd Gemma Proof
 
-| Value | Meaning |
-|--------|---------|
-| mock | Simulated verification (MVP mode) |
-| runtime | Verified using actual AMD/ROCm hardware |
+## Compatibility Note
 
+The `amd_gemma_proof` object is an optional, backward-compatible extension to the Passport schema.
+
+Existing backend responses remain valid if this object is omitted.
+
+When runtime information is unavailable, implementations should populate the object using `mock` or `pending` values rather than removing the fields.
+
+Once real Fireworks and AMD Developer Cloud integration is available, the backend should replace the mock values with actual runtime information.
 ---
 
 ### Credit Status
