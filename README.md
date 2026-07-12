@@ -1,321 +1,200 @@
 # ReproForge Sentinel
 
-ReproForge Sentinel is an AI claim-to-evidence verification system.
+**AI can create technical claims faster than teams can verify them. ReproForge turns those claims into evidence, risk signals, and an auditable Reproducibility Passport.**
 
-The goal is simple: when a repo, AI agent, model card, or developer makes a technical claim, ReproForge checks what evidence exists, what looks risky, what is missing, and what verdict can be given honestly.
+ReproForge Sentinel is FrontierOps' Track 3 project for the AMD Developer Hackathon: ACT II.
 
-We are not building a truth machine. We are building an evidence machine.
+> We are not building a truth machine. We are building an evidence machine.
 
----
+## What it does
 
-## Problem
+A user submits a repository URL, technical claim, target runtime, and policy choices. ReproForge then:
 
-AI tools and developers can now produce technical claims very quickly.
+1. evaluates the submitted claim metadata;
+2. identifies evidence and policy gaps;
+3. creates deterministic risk and reproducibility scores;
+4. uses Gemma to explain structured findings when a real provider is configured;
+5. records AMD-hosted inference or direct ROCm telemetry;
+6. seals the result as a machine-readable Reproducibility Passport.
 
-Examples:
-
-- “This repo gives 95% accuracy.”
-- “This agent can safely modify config files.”
-- “This model runs on AMD or ROCm.”
-- “This script detects phishing links.”
-- “This project is production ready.”
-
-The problem is that these claims are often hard to trust. A repo may be missing its dataset, have unsafe commands, fake metrics, broken dependencies, or no clear proof.
-
-ReproForge Sentinel turns those claims into a clear evidence report.
-
----
-
-## Core Idea
-
-The system takes a claim and produces a Reproducibility Passport.
-
-```text
+~~~text
 Claim
   ↓
-Evidence Check
+Controlled evidence and policy evaluation
   ↓
-Repo / Workflow Risk Scan
+Risk and reproducibility scoring
   ↓
-Verification Run or Controlled Result
+Gemma evidence narrative
   ↓
-Score + Verdict
+AMD runtime proof
   ↓
 Reproducibility Passport
-```
+~~~
 
-The final passport does not say “100% safe” or “100% true.”
+## Judge flow
 
-It says:
+The interface has four focused screens:
 
-> Based on these checks, this claim is verified, partially verified, not verified, high risk, or blocked.
+- Landing — product value and verification flow
+- Intake — repository, claim, runtime, and policy input
+- Trace — readable verification progress and raw logs
+- Passport — verdict, risk signals, evidence, missing proof, hashes, AMD/Gemma provenance, and export controls
 
----
+Fixture mode is always labeled. Live status is shown only after a successful backend response.
 
-## MVP Scope
+## Architecture
 
-For the hackathon MVP, we will start with a small controlled benchmark of repo and workflow cases.
+~~~text
+React + TanStack judge interface
+              │
+              ▼
+          FastAPI API
+ /verify · /runs · /passport
+              │
+      ┌───────┴────────┐
+      ▼                ▼
+Policy and risk     Gemma narrator
+evaluation          Fireworks preferred
+      │                │
+      └───────┬────────┘
+              ▼
+ AMD-hosted provider receipt
+ and/or AMD SMI + ROCm telemetry
+              │
+              ▼
+ Reproducibility Passport
+ evidence · gaps · risks · hashes · proof
+~~~
 
-Example cases:
+## AMD and Gemma integration
 
-| Case | Example claim | Expected result |
+The preferred hackathon path is a real Gemma call through Fireworks AI using the exact configured model identifier. A successful response records:
+
+- model provider and model ID;
+- Gemma task list;
+- run ID and UTC timestamp;
+- measured latency and token usage;
+- proof status;
+- AMD ecosystem status.
+
+Direct AMD hardware evidence is captured with ROCm-backed PyTorch and AMD SMI:
+
+~~~bash
+python scripts/amd_capture.py \
+  --output artifacts/amd-run.json \
+  -- python scripts/amd_smoke.py --size 4096 --repeats 12
+~~~
+
+The artifact is accepted as live AMD proof only when ROCm, AMD device identity, AMD SMI telemetry, and the workload all succeed. See docs/AMD_GPU_RUNBOOK.md.
+
+## Quick start with Docker
+
+Requirements: Docker Engine with Docker Compose.
+
+~~~bash
+cp .env.example .env
+docker compose up --build
+~~~
+
+Open:
+
+- Frontend: http://localhost:3000
+- API health: http://localhost:8000/health
+- API docs: http://localhost:8000/docs
+
+With empty provider keys, the application runs safely in guided fixture/fallback mode.
+
+For a real Fireworks Gemma run, set FIREWORKS_API_KEY and the exact FIREWORKS_MODEL in your local .env file. Never commit that file.
+
+## Local development
+
+Frontend:
+
+~~~bash
+npm install
+npm run dev
+~~~
+
+Backend:
+
+~~~bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+~~~
+
+Set VITE_API_BASE_URL=http://localhost:8000 before building the frontend in backend mode.
+
+## Verification API
+
+| Method | Route | Purpose |
 |---|---|---|
-| Clean repo | “This script runs successfully.” | Verified |
-| Missing dependency | “This repo works out of the box.” | Not verified |
-| Fake accuracy claim | “This model gives 95% accuracy.” | Not enough evidence |
-| Missing dataset | “This model can be reproduced.” | Not verified |
-| Risky install | “This setup script is safe.” | High risk |
-| Agent action | “This agent can safely edit config.” | Needs approval / blocked |
-| Dummy secret | “This repo is production ready.” | High risk |
-
-This lets us build a stable demo without depending on random GitHub repos.
-
----
-
-## Risk Scoring
-
-Repo safety is not treated as a final guarantee. It is treated as a risk assessment based on visible signals.
-
-Possible indicators:
-
-- Dangerous shell commands
-- `sudo` or admin-level commands
-- `curl | bash` or `wget | bash`
-- File deletion or system file access
-- Exposed dummy secrets or API keys
-- Suspicious install scripts
-- Unknown or risky dependencies
-- Network calls
-- Missing dataset
-- Missing evaluation script
-- Claimed result does not match available evidence
-
-Risk levels:
-
-| Score range | Level |
-|---|---|
-| 0-20 | Low |
-| 21-40 | Medium |
-| 41-70 | High |
-| 71+ | Blocked |
-
-This score is a heuristic trust assessment, not a mathematical guarantee of safety.
-
----
-
-## Evidence Validity
-
-Every evidence item should be traceable.
-
-Each evidence item should include:
-
-- Source file or command
-- What was checked
-- Timestamp
-- Hash/checksum if possible
-- Raw output or logs
-- Confidence level
-- Short reason
-
-This makes the passport easier to trust because the user can see why the verdict was given.
-
----
-
-## System Architecture
-
-```text
-User / Judge / Developer
-        │
-        ▼
-ReproForge Dashboard
-Claim input + Passport view
-        │
-        ▼
-FastAPI Backend
-Projects / Claims / Verify / Passport
-        │
-        ├── Claim Parser
-        │      Extracts what is being claimed
-        │
-        ├── Risk Scanner
-        │      Finds risky commands, secrets, unsafe patterns
-        │
-        ├── Evidence Collector
-        │      Collects files, logs, metadata, outputs
-        │
-        ├── Scoring Engine
-        │      Creates risk score and reproducibility score
-        │
-        └── Passport Generator
-               Produces final report/result
-        │
-        ▼
-Database + Cache
-PostgreSQL / SQLite for MVP, Redis later
-        │
-        ▼
-AMD / ROCm Proof Layer
-Mock first, real telemetry when credits are available
-```
-
----
-
-## Planned Backend Flow
-
-```text
-Project created
-      │
-      ▼
-Claim added
-      │
-      ▼
-Verification request
-      │
-      ▼
-Parse claim
-      │
-      ▼
-Scan risk indicators
-      │
-      ▼
-Collect evidence
-      │
-      ▼
-Calculate score
-      │
-      ▼
-Return passport/result
-```
-
-Basic API routes:
-
-```text
-GET  /health
-POST /projects
-POST /claims
-POST /verify
-GET  /runs/{id}
-GET  /passport/{id}
-```
-
----
-
-## Team Roles
-
-| Member | Main focus |
-|---|---|
-| Saad | Product direction, coordination, pitch, demo story |
-| Deban | Backend, API flow, database structure |
-| Mayank | Agentic/data part, benchmark cases, scoring logic |
-| Nivas | Evidence validity, passport flow, visual explanation |
-| Areeba | Research, documentation, simple UI/wireframe support |
-
----
-
-## Branch Flow
-
-```text
-main
-  Stable final work only
-
- dev
-  Combined working version
-
- backend/deban
-  Backend and API work
-
- scoring/mayank
-  Scoring logic and benchmark cases
-
- evidence/nivas
-  Evidence validity and passport flow
-
- docs-ui/areeba
-  Research, docs, UI/wireframe support
-
- product/saad
-  Product direction, pitch, demo story
-```
-
-Rules:
-
-- Do not push directly to `main`.
-- Work in your own branch first.
-- Merge into `dev` after review.
-- Only stable work goes from `dev` to `main`.
-- Do not upload `.env`, API keys, credentials, `.venv`, or large zip files.
-
----
-
-## First Build Targets
-
-### Backend
-
-- Clean FastAPI structure
-- Project model
-- Claim model
-- Verification run model
-- Passport/result output
-- Simple README for backend setup
-
-### Scoring
-
-- 10-15 sample benchmark cases
-- Score indicators
-- Verdict rules
-- Low/Medium/High/Blocked mapping
-
-### Evidence
-
-- Evidence JSON format
-- Trace fields
-- Example evidence items
-- Passport explanation flow
-
-### Docs and UI
-
-- Simple problem explanation
-- Judge-friendly demo flow
-- Claim input screen sketch
-- Result/passport screen sketch
-
----
-
-## Current Status
-
-This project is in early MVP planning and build setup.
-
-The first goal is not to build a perfect full product. The first goal is to create a working flow:
-
-```text
-Claim in → Evidence checked → Risk scored → Passport out
-```
-
-Once that works, we can improve the UI, add stronger backend logic, connect real repo scanning, and later add AMD/ROCm execution proof if credits become available.
-
----
-
-## Short Pitch
-
-AI can generate technical claims faster than humans can verify them.
-
-ReproForge Sentinel helps teams check those claims by turning them into evidence, risk signals, scores, and a clear Reproducibility Passport.
-
-It does not ask users to blindly trust AI output. It shows what was checked, what was missing, and why the final verdict was given.
-
-
----
-
-## Judge-demo frontend
-
-The Lovable-generated TanStack Start frontend is integrated on the `agent/lovable-mvp-integration` branch.
-
-- Four screens: Judge Landing, Claim Intake, Live Sandbox Trace, Reproducibility Passport
-- Guided fixture mode by default, always labelled
-- Backend mode through `VITE_API_BASE_URL`
-- Client contracts: `POST /verify`, `GET /runs/{run_id}`, `GET /passport/{run_id}`
-- Intake state flows into the trace and Passport
-- Raw-log inspection, JSON export, browser PDF export, and run-specific share links
-- AMD/ROCm and Gemma proof remain explicitly unverified until backend confirmation
-
-Run `npm install && npm run dev` after the frontend files are present. Use `npm run build` and `npm run lint` for validation.
+| GET | /health | Runtime health |
+| POST | /projects | Create a project |
+| POST | /claims | Store a project claim |
+| POST | /verify | Start controlled verification |
+| GET | /runs/{run_id} | Read logs and status |
+| GET | /passport/{run_id} | Read the final Passport |
+
+## Canonical AMD/Gemma proof
+
+~~~json
+{
+  "runtime_mode": "fireworks",
+  "amd_status": "active",
+  "gemma_used": true,
+  "gemma_tasks": ["evidence_narrative"],
+  "model_provider": "fireworks",
+  "model_name": "<exact-configured-model-id>",
+  "proof_status": "real",
+  "run_id": "run_xxxxx",
+  "timestamp": "2026-07-12T00:00:00Z",
+  "latency_ms": 842,
+  "tokens_used": 317
+}
+~~~
+
+Unknown or unavailable values remain null. The product never fills missing runtime measurements with invented zeroes.
+
+## Tests
+
+~~~bash
+npm run lint
+npm run build
+PYTHONPATH=backend pytest backend/tests -q
+docker compose build
+~~~
+
+GitHub Actions runs the frontend, backend, and container checks for pull requests and final branches.
+
+## Current truth boundary
+
+The current MVP verifies submitted claim metadata and declared policies. It does not yet clone and execute arbitrary repositories. Guided fixture content is explicitly labeled, and live Gemma or AMD proof appears only after a successful provider response or hardware telemetry capture.
+
+The separate ShadowGuard ML research artifacts remain available under ml-detection. The live API currently uses deterministic policy and evidence-risk rules for predictable judge demonstrations.
+
+## Project structure
+
+~~~text
+backend/             FastAPI application and tests
+src/                 TanStack/React judge interface
+scripts/             AMD smoke and artifact capture tools
+docs/                Passport, evidence, and AMD runbooks
+ml-detection/        ShadowGuard research and benchmark artifacts
+Dockerfile           Frontend container
+docker-compose.yml   Full local stack
+~~~
+
+## Team FrontierOps
+
+- Syed Muhammad Saad — product direction, integration, and submission
+- Deban Kumar — backend and container/runtime support
+- Mayank Mishra — scoring and ShadowGuard research
+- Nivas — evidence, Passport contract, and AMD/Gemma runtime proof
+- Areeba Muhammad — product story, documentation, deck, and demo journey
+
+## License
+
+MIT License. See LICENSE.
