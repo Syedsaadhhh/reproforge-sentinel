@@ -6,6 +6,16 @@ ReproForge Sentinel is FrontierOps' Track 3 project for the AMD Developer Hackat
 
 > We are not building a truth machine. We are building an evidence machine.
 
+## Live deployment
+
+- Frontend: https://reproforge-sentinel.onrender.com/
+- API health: https://reproforge-sentinel-backend.onrender.com/health
+- Interactive API docs: https://reproforge-sentinel-backend.onrender.com/docs
+
+Deployment verification on July 12, 2026 confirmed that the frontend loads, the API health check reports ReproForge Sentinel v0.2.0 as healthy, and a public `POST /verify` request returns a completed run.
+
+The production interface and verification API are live. Real Fireworks/Gemma inference and direct AMD ROCm telemetry remain explicitly marked pending until the evidence checklist in Issue #7 is completed; guided fixture values are never presented as live proof.
+
 ## What it does
 
 A user submits a repository URL, technical claim, target runtime, and policy choices. ReproForge then:
