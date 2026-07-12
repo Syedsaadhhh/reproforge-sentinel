@@ -14,7 +14,7 @@ ReproForge Sentinel is FrontierOps' Track 3 project for the AMD Developer Hackat
 
 Deployment verification on July 12, 2026 confirmed that the frontend loads, the API health check reports ReproForge Sentinel v0.2.0 as healthy, and a public `POST /verify` request returns a completed run.
 
-The production interface and verification API are live. Real Fireworks/Gemma inference and direct AMD ROCm telemetry remain explicitly marked pending until the evidence checklist in Issue #7 is completed; guided fixture values are never presented as live proof.
+The production interface and verification API are live. AMD/Gemma evidence adapters, proof contracts, capture tooling, and strict runtime-status gates are implemented. Provider or hardware measurements appear only when a successful receipt or telemetry artifact is attached; otherwise the Passport preserves an explicit pending state.
 
 ## What it does
 
@@ -23,8 +23,8 @@ A user submits a repository URL, technical claim, target runtime, and policy cho
 1. evaluates the submitted claim metadata;
 2. identifies evidence and policy gaps;
 3. creates deterministic risk and reproducibility scores;
-4. uses Gemma to explain structured findings when a real provider is configured;
-5. records AMD-hosted inference or direct ROCm telemetry;
+4. can use Gemma to explain structured findings when a provider is configured;
+5. can attach an AMD-hosted provider receipt or direct ROCm telemetry;
 6. seals the result as a machine-readable Reproducibility Passport.
 
 ~~~text
@@ -34,9 +34,9 @@ Controlled evidence and policy evaluation
   ↓
 Risk and reproducibility scoring
   ↓
-Gemma evidence narrative
+Evidence narrative (Gemma when configured)
   ↓
-AMD runtime proof
+Runtime proof (provider receipt or ROCm artifact)
   ↓
 Reproducibility Passport
 ~~~
@@ -76,9 +76,9 @@ evaluation          Fireworks preferred
  evidence · gaps · risks · hashes · proof
 ~~~
 
-## AMD and Gemma integration
+## AMD and Gemma evidence layer
 
-The preferred hackathon path is a real Gemma call through Fireworks AI using the exact configured model identifier. A successful response records:
+The repository implements Fireworks/Gemma and direct AMD telemetry adapters behind one proof contract. When a configured provider or hardware run succeeds, the Passport records:
 
 - model provider and model ID;
 - Gemma task list;
@@ -148,7 +148,9 @@ Set VITE_API_BASE_URL=http://localhost:8000 before building the frontend in back
 | GET | /runs/{run_id} | Read logs and status |
 | GET | /passport/{run_id} | Read the final Passport |
 
-## Canonical AMD/Gemma proof
+## Accepted real-proof payload
+
+The following is an illustrative schema for an accepted provider-backed result, not fixture output:
 
 ~~~json
 {
