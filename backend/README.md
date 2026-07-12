@@ -1,81 +1,55 @@
-# Backend Plan
+# ReproForge Sentinel API
 
-Backend owner: Deban
+FastAPI backend for the claim → evidence → risk → Reproducibility Passport flow.
 
-The backend should support the basic ReproForge Sentinel flow:
+## Run locally
 
-```text
-project → claim → verification run → evidence → score → passport/result
-```
+~~~bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+~~~
 
-## Suggested stack
+On Windows, activate the environment with .venv\Scripts\activate.
 
-- FastAPI
-- SQLite for very early MVP, PostgreSQL later
-- Redis later for cache/job status
-- Pydantic schemas
+## Run with Docker
 
-## First routes
+From the repository root:
 
-```text
-GET  /health
-POST /projects
-POST /claims
-POST /verify
-GET  /runs/{id}
-GET  /passport/{id}
-```
+~~~bash
+cp .env.example .env
+docker compose up --build
+~~~
 
-## First models
+API health: http://localhost:8000/health
 
-```text
-Project
-- id
-- name
-- description
-- created_at
+## Environment
 
-Claim
-- id
-- project_id
-- claim_text
-- source_type
-- created_at
+- FIREWORKS_API_KEY and FIREWORKS_MODEL activate the preferred AMD-hosted Fireworks Gemma path.
+- GEMMA_API_KEY and GEMMA_MODEL activate the optional Google Gemini API fallback.
+- ALLOWED_ORIGINS configures browser origins allowed by FastAPI.
 
-VerificationRun
-- id
-- claim_id
-- status
-- verdict
-- risk_score
-- reproducibility_score
-- created_at
+Never put provider keys in frontend variables or commit them to GitHub.
 
-EvidenceItem
-- id
-- run_id
-- source
-- check
-- status
-- details
-- confidence
+## Proof behavior
 
-Passport
-- id
-- run_id
-- summary
-- verdict
-- evidence_coverage
-- output_json
-```
+- A successful provider response produces proof_status=real with the exact provider, model, task list, run ID, timestamp, latency and token usage.
+- No key or an API failure produces proof_status=pending with deterministic fallback text and no invented metrics.
+- Fireworks-confirmed inference marks the AMD ecosystem path active because the event provides Fireworks inference on AMD-hosted infrastructure.
+- Direct hardware proof becomes LIVE_ROCM_VERIFIED only after amd-smi telemetry succeeds.
+- The backend records evidence hashes for successful provider receipts and live AMD telemetry.
 
-## First verify workflow
+## API
 
-1. Receive claim input
-2. Parse the claim text
-3. Detect sample risk indicators
-4. Return score and verdict
-5. Store result
-6. Return passport-style JSON
+- GET /health
+- POST /projects
+- POST /claims
+- POST /verify
+- GET /runs/{run_id}
+- GET /passport/{run_id}
 
-Keep it simple first. The goal is a working flow, not a perfect backend.
+## Current scope
+
+The API evaluates submitted claim metadata and declared policies. It does not yet clone or execute arbitrary repositories. This limitation is intentional and visible in every generated Passport.
