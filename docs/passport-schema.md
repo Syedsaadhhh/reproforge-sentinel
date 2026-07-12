@@ -284,6 +284,53 @@ Fields:
 
 ---
 
+### Runtime Mode
+
+| Value | Meaning |
+|--------|---------|
+| mock | Simulated execution |
+| fireworks | Executed using Fireworks AI |
+| amd_cloud | Executed on AMD Developer Cloud |
+
+---
+
+### AMD Status
+
+| Value | Meaning |
+|--------|---------|
+| pending | AMD execution not yet performed |
+| active | Executed on AMD infrastructure |
+
+---
+
+### Gemma Tasks
+
+| Value | Meaning |
+|--------|---------|
+| claim_parser | Extract technical claims |
+| evidence_summary | Summarize collected evidence |
+| risk_explanation | Generate explanations for detected risks |
+| passport_writer | Generate the Passport narrative |
+
+---
+
+### Model Provider
+
+| Value | Meaning |
+|--------|---------|
+| local_mock | Local mock implementation |
+| fireworks | Fireworks AI |
+| amd_hosted | AMD-hosted deployment |
+
+---
+
+### Proof Status
+
+| Value | Meaning |
+|--------|---------|
+| mock | Simulated inference |
+| pending | Awaiting real execution |
+| real | Generated from actual model inference |
 ### Amd Gemma Proof
 
 ## Compatibility Note
