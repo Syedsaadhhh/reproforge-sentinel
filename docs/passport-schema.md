@@ -226,11 +226,41 @@ Fields:
     "Document benchmark methodology."
   ],
 
-  "amd_proof": {
-    "mode": "mock",
-    "credit_status": "pending",
-    "runtime_target": "rocm"
+  "amd_gemma_proof": {
+  "runtime_mode": "mock",
+  "amd_status": "pending",
+  "gemma_used": false,
+  "gemma_tasks": [],
+  "model_provider": "local_mock",
+  "model_name": null,
+  "proof_status": "mock",
+  "latency_ms": null,
+  "tokens_used": null,
+  "run_id": null,
+  "timestamp": null
   }
+}
+```
+
+> **Note:** The values shown above are illustrative. During actual verification, `model_name`, `run_id`, `latency_ms`, `tokens_used`, and `timestamp` must be populated from the live Fireworks/AMD runtime instead of hardcoded values.
+### Real Runtime Example (Illustrative)
+
+```json
+"amd_gemma_proof": {
+  "runtime_mode": "fireworks",
+  "amd_status": "active",
+  "gemma_used": true,
+  "gemma_tasks": [
+    "claim_parser",
+    "passport_writer"
+  ],
+  "model_provider": "fireworks",
+  "model_name": "<configured_fireworks_model_id>",
+  "proof_status": "real",
+  "latency_ms": 143,
+  "tokens_used": 512,
+  "run_id": "run_xxxxx",
+  "timestamp": "2026-07-07T10:30:45Z"
 }
 ```
 
