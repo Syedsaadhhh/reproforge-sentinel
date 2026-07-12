@@ -1,0 +1,31 @@
+services:
+  # backend - docker
+  - type: web
+    name: reproforge-api
+    env: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: FIREWORKS_API_KEY
+        sync: false
+      - key: GEMMA_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://reproforge-frontend.onrender.com
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # frontend - docker
+  - type: web
+    name: reproforge-frontend
+    env: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./frontend.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://reproforge-api.onrender.com
+    autoDeploy: true
