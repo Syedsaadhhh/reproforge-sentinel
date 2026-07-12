@@ -110,7 +110,9 @@ function TracePage() {
                   ? "Run terminated by operator."
                   : paused
                     ? "Run paused."
-                    : "Streaming from ephemeral sandbox…"}
+                    : runtimeMode === "backend"
+                      ? "Replaying the completed backend evaluation…"
+                      : "Replaying a guided fixture evaluation…"}
           </p>
         </div>
         <div className="flex gap-2">
@@ -178,14 +180,14 @@ function TracePage() {
           <div className="grid grid-cols-2 gap-3">
             <MetricCard
               label="risk_score"
-              value={step >= 3 ? "0.9037" : "—"}
+              value={step >= 3 ? passport.shadowguard_result.risk_score.toFixed(4) : "—"}
               tone="danger"
               mono
               hint="shadowguard"
             />
             <MetricCard
               label="reproducibility"
-              value={complete ? "0.42" : "—"}
+              value={complete ? passport.shadowguard_result.reproducibility_score.toFixed(2) : "—"}
               tone="warning"
               mono
             />
