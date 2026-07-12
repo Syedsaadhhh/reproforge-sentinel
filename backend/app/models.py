@@ -74,16 +74,26 @@ class ShadowGuardResult(BaseModel):
 
 class AmdGemmaProof(BaseModel):
     gemma_used: bool
-    gemma_task: str
+    gemma_task: str | None = None
+    gemma_tasks: list[str] = Field(default_factory=list)
     model_provider: str
     model_family: str = "gemma"
-    model_name: str
+    model_name: str | None = None
     runtime_mode: str
+    amd_status: Literal["pending", "active"] = "pending"
     amd_proof_status: str
-    proof_status: Literal["fixture_until_backend", "real_api_call"]
+    proof_status: Literal[
+        "mock",
+        "pending",
+        "real",
+        "fixture_until_backend",
+        "real_api_call",
+    ]
     fireworks_confirmed: bool = False
-    latency_ms: int
-    tokens_used: int
+    run_id: str | None = None
+    timestamp: str | None = None
+    latency_ms: int | None = None
+    tokens_used: int | None = None
     amd_telemetry: dict = Field(default_factory=dict)
 
 

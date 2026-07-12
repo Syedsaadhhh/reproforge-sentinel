@@ -1,22 +1,55 @@
 # ReproForge Sentinel API
 
-FastAPI backend for the claim → evidence → risk → Passport flow.
+FastAPI backend for the claim → evidence → risk → Reproducibility Passport flow.
 
-## Run
+## Run locally
 
-```bash
+~~~bash
+cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
-```
+~~~
 
-Set the frontend variable `VITE_API_BASE_URL=http://localhost:8000`.
+On Windows, activate the environment with .venv\Scripts\activate.
 
-## Proof behaviour
+## Run with Docker
 
-- With no `GEMMA_API_KEY`, the evidence narrative is deterministic and labelled `fixture_until_backend`.
-- With a valid key, the adapter calls the official Gemini API Gemma 4 model and marks proof real only after a successful response.
-- AMD proof becomes `LIVE_ROCM_VERIFIED` only when `amd-smi metric --json` succeeds. Missing hardware or tooling stays pending.
+From the repository root:
 
-The backend does not yet clone or execute arbitrary repositories. Its current job is to establish the real API/data/proof pipeline safely.
+~~~bash
+cp .env.example .env
+docker compose up --build
+~~~
+
+API health: http://localhost:8000/health
+
+## Environment
+
+- FIREWORKS_API_KEY and FIREWORKS_MODEL activate the preferred AMD-hosted Fireworks Gemma path.
+- GEMMA_API_KEY and GEMMA_MODEL activate the optional Google Gemini API fallback.
+- ALLOWED_ORIGINS configures browser origins allowed by FastAPI.
+
+Never put provider keys in frontend variables or commit them to GitHub.
+
+## Proof behavior
+
+- A successful provider response produces proof_status=real with the exact provider, model, task list, run ID, timestamp, latency and token usage.
+- No key or an API failure produces proof_status=pending with deterministic fallback text and no invented metrics.
+- Fireworks-confirmed inference marks the AMD ecosystem path active because the event provides Fireworks inference on AMD-hosted infrastructure.
+- Direct hardware proof becomes LIVE_ROCM_VERIFIED only after amd-smi telemetry succeeds.
+- The backend records evidence hashes for successful provider receipts and live AMD telemetry.
+
+## API
+
+- GET /health
+- POST /projects
+- POST /claims
+- POST /verify
+- GET /runs/{run_id}
+- GET /passport/{run_id}
+
+## Current scope
+
+The API evaluates submitted claim metadata and declared policies. It does not yet clone or execute arbitrary repositories. This limitation is intentional and visible in every generated Passport.

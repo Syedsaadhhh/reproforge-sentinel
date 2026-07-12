@@ -17,6 +17,7 @@ async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) 
     model = os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it")
     fallback = _fallback_explanation(signals, missing)
     prompt = json.dumps({"claim": claim, "signals": signals, "missing_evidence": missing})
+
     if fireworks_key and fireworks_model:
         return await _fireworks_explanation(
             fireworks_key,
@@ -24,16 +25,17 @@ async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) 
             prompt,
             fallback,
         )
+
     if not api_key:
         return {
             "text": fallback,
             "used": False,
-            "provider": "google-gemini-api",
-            "model": model,
-            "runtime_mode": "fixture",
-            "proof_status": "fixture_until_backend",
-            "latency_ms": 0,
-            "tokens_used": 0,
+            "provider": "local_mock",
+            "model": None,
+            "runtime_mode": "mock",
+            "proof_status": "pending",
+            "latency_ms": None,
+            "tokens_used": None,
         }
 
     started = time.perf_counter()
@@ -50,15 +52,16 @@ async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) 
             data = response.json()
         text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
         usage = data.get("usageMetadata", {})
+        tokens = usage.get("totalTokenCount")
         return {
             "text": text,
             "used": True,
             "provider": "google-gemini-api",
             "model": model,
             "runtime_mode": "gemini_api",
-            "proof_status": "real_api_call",
+            "proof_status": "real",
             "latency_ms": round((time.perf_counter() - started) * 1000),
-            "tokens_used": int(usage.get("totalTokenCount", 0)),
+            "tokens_used": int(tokens) if tokens is not None else None,
         }
     except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
         return {
@@ -67,9 +70,9 @@ async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) 
             "provider": "google-gemini-api",
             "model": model,
             "runtime_mode": "api_error_fallback",
-            "proof_status": "fixture_until_backend",
+            "proof_status": "pending",
             "latency_ms": round((time.perf_counter() - started) * 1000),
-            "tokens_used": 0,
+            "tokens_used": None,
         }
 
 
@@ -93,15 +96,17 @@ async def _fireworks_explanation(api_key: str, model: str, prompt: str, fallback
             )
             response.raise_for_status()
             data = response.json()
+        usage = data.get("usage", {})
+        tokens = usage.get("total_tokens")
         return {
             "text": data["choices"][0]["message"]["content"].strip(),
             "used": True,
             "provider": "fireworks",
             "model": model,
             "runtime_mode": "fireworks",
-            "proof_status": "real_api_call",
+            "proof_status": "real",
             "latency_ms": round((time.perf_counter() - started) * 1000),
-            "tokens_used": int(data.get("usage", {}).get("total_tokens", 0)),
+            "tokens_used": int(tokens) if tokens is not None else None,
         }
     except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
         return {
@@ -110,10 +115,12 @@ async def _fireworks_explanation(api_key: str, model: str, prompt: str, fallback
             "provider": "fireworks",
             "model": model,
             "runtime_mode": "api_error_fallback",
-            "proof_status": "fixture_until_backend",
+            "proof_status": "pending",
             "latency_ms": round((time.perf_counter() - started) * 1000),
-            "tokens_used": 0,
+            "tokens_used": None,
         }
+
+
 def _fallback_explanation(signals: list[dict], missing: list[str]) -> str:
     signal_names = ", ".join(signal["label"].lower() for signal in signals) or "no critical risk signals"
     missing_text = ", ".join(item.lower() for item in missing) or "no declared evidence gaps"

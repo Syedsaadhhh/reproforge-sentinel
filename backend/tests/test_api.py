@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.models import AmdGemmaProof
 
 
 client = TestClient(app)
@@ -31,16 +32,52 @@ def test_project_and_claim_creation() -> None:
     assert stored_claim.json()["project_id"] == project.json()["id"]
 
 
-def test_verify_run_and_passport() -> None:
+def test_verify_run_and_passport(monkeypatch) -> None:
+    monkeypatch.delenv("FIREWORKS_API_KEY", raising=False)
+    monkeypatch.delenv("FIREWORKS_MODEL", raising=False)
+    monkeypatch.delenv("GEMMA_API_KEY", raising=False)
+
     verify = client.post("/verify", json=claim)
     assert verify.status_code == 200
     run_id = verify.json()["run_id"]
     run = client.get(f"/runs/{run_id}")
     passport = client.get(f"/passport/{run_id}")
+
     assert run.status_code == 200
     assert run.json()["status"] == "complete"
     assert passport.status_code == 200
+
     body = passport.json()
+    proof = body["amd_gemma_proof"]
     assert body["run_id"] == run_id
-    assert body["amd_gemma_proof"]["proof_status"] == "fixture_until_backend"
-    assert body["amd_gemma_proof"]["gemma_used"] is False
+    assert proof["proof_status"] == "pending"
+    assert proof["gemma_used"] is False
+    assert proof["gemma_tasks"] == []
+    assert proof["model_provider"] == "local_mock"
+    assert proof["model_name"] is None
+    assert proof["latency_ms"] is None
+    assert proof["tokens_used"] is None
+    assert proof["run_id"] is None
+    assert proof["timestamp"] is None
+
+
+def test_real_proof_contract_is_traceable() -> None:
+    proof = AmdGemmaProof(
+        gemma_used=True,
+        gemma_task="evidence_narrative",
+        gemma_tasks=["evidence_narrative"],
+        model_provider="fireworks",
+        model_name="configured-model-id",
+        runtime_mode="fireworks",
+        amd_status="active",
+        amd_proof_status="AMD_PATH_CONFIGURED",
+        proof_status="real",
+        fireworks_confirmed=True,
+        run_id="run_test",
+        timestamp="2026-07-12T00:00:00Z",
+        latency_ms=120,
+        tokens_used=256,
+    )
+    assert proof.proof_status == "real"
+    assert proof.gemma_tasks == ["evidence_narrative"]
+    assert proof.run_id == "run_test"
