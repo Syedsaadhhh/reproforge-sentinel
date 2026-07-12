@@ -50,7 +50,7 @@ async def verify(claim: ClaimInput) -> Passport:
     signals, missing, blocked = _scan(claim)
     risk = min(0.95, 0.18 + len(signals) * 0.27 + len(blocked) * 0.08)
     reproducibility = max(0.05, 0.82 - len(missing) * 0.19 - len(signals) * 0.12)
-    verdict = "partial" if signals else "verified"
+    verdict = "partial" if (signals or missing) else "verified"
 
     gemma = await explain_evidence(claim.claim_text, signals, missing)
     amd = collect_amd_proof()
