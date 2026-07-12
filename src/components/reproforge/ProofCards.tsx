@@ -4,7 +4,7 @@ import type { AmdGemmaProof } from "@/data/mockPassport";
 
 export function AMDProofCard({ proof }: { proof: AmdGemmaProof }) {
   const telemetryAvailable = proof.amd_telemetry?.available === true;
-  const isActive =\n    proof.amd_status === "active" || proof.amd_proof_status === "LIVE_ROCM_VERIFIED";
+  const isActive = proof.amd_status === "active" || proof.amd_proof_status === "LIVE_ROCM_VERIFIED";
 
   return (
     <ProofCard
@@ -33,8 +33,7 @@ export function AMDProofCard({ proof }: { proof: AmdGemmaProof }) {
 
 export function GemmaProofCard({ proof }: { proof: AmdGemmaProof }) {
   const isReal =
-    (proof.proof_status === "real" || proof.proof_status === "real_api_call") &&
-    proof.gemma_used;
+    (proof.proof_status === "real" || proof.proof_status === "real_api_call") && proof.gemma_used;
 
   return (
     <ProofCard
@@ -68,13 +67,7 @@ export function GemmaProofCard({ proof }: { proof: AmdGemmaProof }) {
   );
 }
 
-function Row({
-  k,
-  v,
-}: {
-  k: string;
-  v: string | number | null | undefined;
-}) {
+function Row({ k, v }: { k: string; v: string | number | null | undefined }) {
   return (
     <>
       <dt className="text-muted-foreground">{k}</dt>
