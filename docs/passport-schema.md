@@ -240,6 +240,8 @@ Fields:
   "timestamp": null
   }
 }
+```
+
 > **Note:** The values shown above are illustrative. During actual verification, `model_name`, `run_id`, `latency_ms`, `tokens_used`, and `timestamp` must be populated from the live Fireworks/AMD runtime instead of hardcoded values.
 ### Real Runtime Example (Illustrative)
 
@@ -260,7 +262,6 @@ Fields:
   "run_id": "run_xxxxx",
   "timestamp": "2026-07-07T10:30:45Z"
 }
-```
 ```
 
 ---
