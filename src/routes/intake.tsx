@@ -64,8 +64,8 @@ function IntakePage() {
           <StatusBadge tone="cyan">step 01 · intake</StatusBadge>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">Submit a claim</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            This MVP evaluates claim metadata and declared policies; arbitrary repositories are not yet
-            cloned or executed. Do not submit secrets, keys, or private URLs.
+            This MVP evaluates claim metadata and declared policies; arbitrary repositories are not
+            yet cloned or executed. Do not submit secrets, keys, or private URLs.
           </p>
         </div>
       </div>
@@ -192,7 +192,10 @@ function IntakePage() {
               <li>✓ Claim metadata and declared policies will be evaluated</li>
               <li>✓ ShadowGuard policy shadowguard/2026.07-strict attached</li>
               <li>✓ Gemma explanation contract prepared for backend proxy</li>
-              <li className="text-warning">! Gemma/AMD proof stays pending unless a configured backend returns verified provenance</li>
+              <li className="text-warning">
+                ! Gemma/AMD proof stays pending unless a configured backend returns verified
+                provenance
+              </li>
             </ul>
           </div>
         </aside>
