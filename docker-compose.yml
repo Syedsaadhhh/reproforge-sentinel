@@ -4,7 +4,7 @@ services:
       context: ./backend
     environment:
       FIREWORKS_API_KEY: ${FIREWORKS_API_KEY:-}
-      FIREWORKS_MODEL: ${FIREWORKS_MODEL:-accounts/fireworks/models/gemma-4-26b-a4b-it}
+      FIREWORKS_MODEL: ${FIREWORKS_MODEL:-}
       AMD_PROOF_FILE: ${AMD_PROOF_FILE:-}
       GEMMA_API_KEY: ${GEMMA_API_KEY:-}
       GEMMA_MODEL: ${GEMMA_MODEL:-gemma-4-26b-a4b-it}
