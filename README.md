@@ -91,11 +91,11 @@ Direct AMD hardware evidence is captured with ROCm-backed PyTorch and AMD SMI:
 
 ~~~bash
 python scripts/amd_capture.py \
-  --output artifacts/amd-run.json \
+  --output backend/artifacts/amd-run.json \
   -- python scripts/amd_smoke.py --size 4096 --repeats 12
 ~~~
 
-The artifact is accepted as live AMD proof only when ROCm, AMD device identity, AMD SMI telemetry, and the workload all succeed. See docs/AMD_GPU_RUNBOOK.md.
+The artifact is accepted as live AMD proof only when ROCm, AMD device identity, AMD SMI telemetry, the workload, and the artifact hash all validate. Fireworks confirmation is tracked separately and never substitutes for direct AMD hardware evidence. See docs/AMD_GPU_RUNBOOK.md.
 
 ## Quick start with Docker
 
@@ -114,7 +114,7 @@ Open:
 
 With empty provider keys, the application runs safely in guided fixture/fallback mode.
 
-For a real Fireworks Gemma run, set FIREWORKS_API_KEY and the exact FIREWORKS_MODEL in your local .env file. Never commit that file.
+For a real Fireworks Gemma run, set `FIREWORKS_API_KEY`. The default verified model path is `accounts/fireworks/models/gemma-4-26b-a4b-it`; override `FIREWORKS_MODEL` only when intentionally selecting another available Gemma model. Never commit the key or local `.env` file.
 
 ## Local development
 

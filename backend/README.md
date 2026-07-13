@@ -35,7 +35,7 @@ Never put provider keys in frontend variables or commit them to GitHub.
 
 ## Proof behavior
 
-- A successful provider response produces proof_status=real with the exact provider, model, task list, run ID, timestamp, latency and token usage.
+- A successful provider response produces proof_status=real with the exact provider, model, task list, run ID, timestamp, latency and token usage. Fireworks defaults to `accounts/fireworks/models/gemma-4-26b-a4b-it` when a key is configured.
 - No key or an API failure produces proof_status=pending with deterministic fallback text and no invented metrics.
 - Fireworks-confirmed inference marks the AMD ecosystem path active because the event provides Fireworks inference on AMD-hosted infrastructure.
 - Direct hardware proof becomes LIVE_ROCM_VERIFIED only after amd-smi telemetry succeeds.

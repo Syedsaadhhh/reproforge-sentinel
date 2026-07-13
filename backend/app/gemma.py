@@ -12,13 +12,13 @@ Return concise plain text suitable for a technical audit passport."""
 
 async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) -> dict:
     fireworks_key = os.getenv("FIREWORKS_API_KEY")
-    fireworks_model = os.getenv("FIREWORKS_MODEL")
+    fireworks_model = os.getenv("FIREWORKS_MODEL") or "accounts/fireworks/models/gemma-4-26b-a4b-it"
     api_key = os.getenv("GEMMA_API_KEY")
     model = os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it")
     fallback = _fallback_explanation(signals, missing)
     prompt = json.dumps({"claim": claim, "signals": signals, "missing_evidence": missing})
 
-    if fireworks_key and fireworks_model:
+    if fireworks_key:
         return await _fireworks_explanation(
             fireworks_key,
             fireworks_model,

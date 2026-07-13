@@ -11,7 +11,7 @@
 
 ```bash
 python scripts/amd_capture.py \
-  --output artifacts/amd-run.json \
+  --output backend/artifacts/amd-run.json \
   -- python scripts/amd_smoke.py --size 4096 --repeats 12
 ```
 
@@ -27,5 +27,15 @@ The run is accepted as live AMD proof only when all are true:
 - `amd-smi` is installed and telemetry is captured;
 - result includes latency, throughput and peak memory;
 - artifact hash is preserved in the Passport.
+
+The capture script now evaluates every gate before it can emit `LIVE_ROCM_VERIFIED`. The backend independently recomputes the artifact hash and evaluates the gates again before exposing hardware proof.
+
+After a successful run, review the JSON for secrets, commit the unchanged artifact on a separate branch, and configure the backend with:
+
+```text
+AMD_PROOF_FILE=/app/artifacts/amd-run.json
+```
+
+Destroy the GPU Droplet after downloading and backing up the artifact. Powering it off does not stop billing.
 
 If any gate fails, keep the UI state as `AMD_UNAVAILABLE` or `AMD_PATH_CONFIGURED`—never `LIVE_ROCM_VERIFIED`.
