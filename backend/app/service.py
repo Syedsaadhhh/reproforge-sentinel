@@ -55,7 +55,7 @@ async def verify(claim: ClaimInput) -> Passport:
     gemma = await explain_evidence(claim.claim_text, signals, missing)
     amd = collect_amd_proof()
     fireworks_confirmed = bool(gemma["used"] and gemma["provider"] == "fireworks")
-    amd_active = amd["status"] == "LIVE_ROCM_VERIFIED" or fireworks_confirmed
+    amd_active = amd["status"] == "LIVE_ROCM_VERIFIED"
     proof_status = "real" if gemma["used"] else "pending"
 
     logs = [
@@ -91,7 +91,7 @@ async def verify(claim: ClaimInput) -> Passport:
             "detail": f"{gemma['provider']} · {gemma['model']} · {gemma['tokens_used']} tokens",
             "hash": _sha256(gemma),
         })
-    if amd["telemetry"].get("available"):
+    if amd_active:
         evidence.append({
             "id": "ev-amd",
             "kind": "artifact",
@@ -105,7 +105,7 @@ async def verify(claim: ClaimInput) -> Passport:
         "environment_hash": _sha256(claim.runtime_target),
         "log_hash": _sha256([log.model_dump() for log in logs]),
     }
-    if amd["telemetry"].get("available"):
+    if amd_active:
         hashes["amd_telemetry_hash"] = _sha256(amd["telemetry"])
 
     passport = Passport(
@@ -147,7 +147,7 @@ async def verify(claim: ClaimInput) -> Passport:
         hashes=hashes,
         security_notes=[
             "No repository code was executed by this API stage.",
-            "Live hardware proof is shown only after a successful provider response or AMD SMI telemetry.",
+            "Live Gemma proof requires a successful provider response; live AMD proof requires a validated ROCm workload artifact.",
         ],
     )
     PASSPORTS[run_id] = passport
