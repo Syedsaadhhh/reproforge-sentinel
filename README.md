@@ -14,7 +14,7 @@ ReproForge Sentinel is FrontierOps' Track 3 project for the AMD Developer Hackat
 
 Deployment verification on July 12, 2026 confirmed that the frontend loads, the API health check reports ReproForge Sentinel v0.2.0 as healthy, and a public `POST /verify` request returns a completed run.
 
-The production interface and verification API are live. AMD/Gemma evidence adapters, proof contracts, capture tooling, and strict runtime-status gates are implemented. Provider or hardware measurements appear only when a successful receipt or telemetry artifact is attached; otherwise the Passport preserves an explicit pending state.
+The production interface and verification API are live. AMD/Gemma evidence adapters, proof contracts, capture tooling, and strict runtime-status gates are implemented. A real Google Gemma 4 provider response and a hash-linked AMD ROCm workload artifact were captured on July 13, 2026. Provider or hardware measurements appear only when a successful receipt or validated telemetry artifact is attached; otherwise the Passport preserves an explicit pending state.
 
 ## What it does
 
@@ -96,6 +96,23 @@ python scripts/amd_capture.py \
 ~~~
 
 The artifact is accepted as live AMD proof only when ROCm, AMD device identity, AMD SMI telemetry, the workload, and the artifact hash all validate. Fireworks confirmation is tracked separately and never substitutes for direct AMD hardware evidence. See docs/AMD_GPU_RUNBOOK.md.
+
+### Verified runtime evidence
+
+The committed artifact at `backend/artifacts/amd-run.json` passed every backend validation gate:
+
+| Evidence | Verified result |
+|---|---|
+| Proof status | `LIVE_ROCM_VERIFIED` |
+| Workload | FP16 4096×4096 matrix multiplication, 12 measured repeats |
+| ROCm | 7.2.53211 |
+| PyTorch | 2.13.0+rocm7.2 |
+| Median latency | 2.09 ms |
+| Throughput | 65.763 TFLOPS |
+| Peak memory | 172.0 MB |
+| Artifact SHA-256 | `2d16ad98df1b3b80eb4fb651c927b54c5ed08c1841bf07b73fc78cf7f06600ee` |
+
+A production Passport also recorded a successful Google Gemma 4 evidence-narrative call with `gemma_used=true`, provider `google-gemini-api`, model `gemma-4-31b-it`, measured latency and token usage. Fireworks remained optional because its Gemma 4 path required a separate on-demand deployment and billing verification.
 
 ## Quick start with Docker
 
@@ -183,7 +200,7 @@ GitHub Actions runs the frontend, backend, and container checks for pull request
 
 ## Current truth boundary
 
-The current MVP verifies submitted claim metadata and declared policies. It does not yet clone and execute arbitrary repositories. Guided fixture content is explicitly labeled, and live Gemma or AMD proof appears only after a successful provider response or hardware telemetry capture.
+The current MVP verifies submitted claim metadata and declared policies. It does not yet clone and execute arbitrary repositories. Guided fixture content is explicitly labeled. Live Gemma proof requires a successful provider response, and live AMD proof requires the independently validated, hash-linked ROCm artifact committed in this repository.
 
 The separate ShadowGuard ML research artifacts remain available under ml-detection. The live API currently uses deterministic policy and evidence-risk rules for predictable judge demonstrations.
 
