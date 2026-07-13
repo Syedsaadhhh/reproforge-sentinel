@@ -114,7 +114,7 @@ Open:
 
 With empty provider keys, the application runs safely in guided fixture/fallback mode.
 
-For a real Fireworks Gemma run, set `FIREWORKS_API_KEY`. The default verified model path is `accounts/fireworks/models/gemma-4-26b-a4b-it`; override `FIREWORKS_MODEL` only when intentionally selecting another available Gemma model. Never commit the key or local `.env` file.
+For a real Fireworks Gemma run, create an on-demand Gemma deployment, then set `FIREWORKS_API_KEY` and its identifier in the form `accounts/<ACCOUNT_ID>/deployments/<DEPLOYMENT_ID>`. Gemma 4 base-model IDs are not serverless endpoints. If Fireworks is unavailable and `GEMMA_API_KEY` is configured, the backend automatically tries the official Google AI API. Never commit keys or a local `.env` file.
 
 ## Local development
 

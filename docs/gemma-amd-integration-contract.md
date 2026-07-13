@@ -30,7 +30,7 @@ risk_explanation
 AMD appears through:
 
 - AMD Developer Cloud credit received
-- Fireworks AI models hosted on AMD hardware
+- Fireworks provider inference, tracked separately from direct AMD hardware proof
 - optional AMD GPU/ROCm runtime if we spin up a cloud instance
 - Passport proof fields showing the runtime path honestly
 
@@ -75,7 +75,7 @@ Every `/verify` response should include:
 Use these statuses:
 
 - `LIVE_ROCM_VERIFIED` only if real ROCm telemetry is captured
-- `AMD_PATH_CONFIGURED` if AMD/Fireworks path is configured but no ROCm telemetry is captured
+- `AMD_PATH_CONFIGURED` if the direct AMD proof path is configured but no validated ROCm artifact is attached
 - `AMD_AWARE_SIMULATED` if using fixture/mock telemetry
 - `AMD_UNAVAILABLE` if no AMD/Fireworks path is active
 
@@ -83,7 +83,7 @@ Use these statuses:
 
 Good:
 
-> Gemma via Fireworks explains risk signals and Passport reasoning. AMD proof status shows the runtime path honestly.
+> Gemma explains risk signals and Passport reasoning through a verified provider response. AMD proof is reported separately from a validated ROCm workload artifact.
 
 Avoid:
 

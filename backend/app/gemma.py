@@ -12,32 +12,42 @@ Return concise plain text suitable for a technical audit passport."""
 
 async def explain_evidence(claim: str, signals: list[dict], missing: list[str]) -> dict:
     fireworks_key = os.getenv("FIREWORKS_API_KEY")
-    fireworks_model = os.getenv("FIREWORKS_MODEL") or "accounts/fireworks/models/gemma-4-26b-a4b-it"
+    fireworks_model = os.getenv("FIREWORKS_MODEL")
     api_key = os.getenv("GEMMA_API_KEY")
     model = os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it")
     fallback = _fallback_explanation(signals, missing)
     prompt = json.dumps({"claim": claim, "signals": signals, "missing_evidence": missing})
 
-    if fireworks_key:
-        return await _fireworks_explanation(
+    fireworks_result = None
+    if fireworks_key and fireworks_model:
+        fireworks_result = await _fireworks_explanation(
             fireworks_key,
             fireworks_model,
             prompt,
             fallback,
         )
+        if fireworks_result["used"]:
+            return fireworks_result
 
-    if not api_key:
-        return {
-            "text": fallback,
-            "used": False,
-            "provider": "local_mock",
-            "model": None,
-            "runtime_mode": "mock",
-            "proof_status": "pending",
-            "latency_ms": None,
-            "tokens_used": None,
-        }
+    if api_key:
+        return await _google_explanation(api_key, model, prompt, fallback)
 
+    if fireworks_result is not None:
+        return fireworks_result
+
+    return {
+        "text": fallback,
+        "used": False,
+        "provider": "local_mock",
+        "model": None,
+        "runtime_mode": "mock",
+        "proof_status": "pending",
+        "latency_ms": None,
+        "tokens_used": None,
+    }
+
+
+async def _google_explanation(api_key: str, model: str, prompt: str, fallback: str) -> dict:
     started = time.perf_counter()
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     payload = {

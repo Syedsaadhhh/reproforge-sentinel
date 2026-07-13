@@ -27,7 +27,7 @@ API health: http://localhost:8000/health
 
 ## Environment
 
-- FIREWORKS_API_KEY and FIREWORKS_MODEL activate the preferred AMD-hosted Fireworks Gemma path.
+- FIREWORKS_API_KEY and a deployment-form FIREWORKS_MODEL activate the preferred Fireworks Gemma path.
 - GEMMA_API_KEY and GEMMA_MODEL activate the optional Google Gemini API fallback.
 - ALLOWED_ORIGINS configures browser origins allowed by FastAPI.
 
@@ -35,9 +35,10 @@ Never put provider keys in frontend variables or commit them to GitHub.
 
 ## Proof behavior
 
-- A successful provider response produces proof_status=real with the exact provider, model, task list, run ID, timestamp, latency and token usage. Fireworks defaults to `accounts/fireworks/models/gemma-4-26b-a4b-it` when a key is configured.
+- A successful provider response produces proof_status=real with the exact provider, model, task list, run ID, timestamp, latency and token usage. Gemma 4 on Fireworks requires an on-demand deployment identifier.
 - No key or an API failure produces proof_status=pending with deterministic fallback text and no invented metrics.
-- Fireworks-confirmed inference marks the AMD ecosystem path active because the event provides Fireworks inference on AMD-hosted infrastructure.
+- If Fireworks fails and GEMMA_API_KEY is configured, the official Google AI API is attempted automatically.
+- Provider confirmation never substitutes for direct AMD/ROCm hardware evidence.
 - Direct hardware proof becomes LIVE_ROCM_VERIFIED only after amd-smi telemetry succeeds.
 - The backend records evidence hashes for successful provider receipts and live AMD telemetry.
 
